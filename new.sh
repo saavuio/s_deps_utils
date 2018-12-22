@@ -1,5 +1,4 @@
 #!/bin/bash
-
 if [ -d dependencies ]; then echo "Already initiated"; exit 1; fi
 if [ -z $1 ]; then echo "Provide a name as the first argument"; exit 1; fi
 if [ -z $2 ]; then echo "Provide a version as the second argument"; exit 1; fi
@@ -9,7 +8,7 @@ SDEP_VERSION=$2
 mkdir dependencies
 
 echo "#!/bin/bash
-function get {
+function fetch {
   NAME=\$1
   VERSION=\$2
   if [ -z \$NOCLONE ]; then
@@ -25,8 +24,12 @@ function get {
     fi
     git clone --single-branch -b \$VERSION https://github.com/saavuio/\$NAME
   fi
-  PROJECT_ROOT_PATH=.. ./\$NAME/scripts/after_get.sh
+  PROJECT_ROOT_PATH=.. ./\$NAME/scripts/after_fetch.sh
+}
+function build {
+  NAME=\$1
   ./\$NAME/scripts/docker_build.sh
+  PROJECT_ROOT_PATH=.. ./\$NAME/scripts/after_build.sh
 }
 " > dependencies/helpers.sh
 chmod +x dependencies/helpers.sh
@@ -38,7 +41,8 @@ cd \$SCRIPT_DIR
 . ./helpers.sh
 
 # -- $SDEP_NAME
-get \"$SDEP_NAME\" \"$SDEP_VERSION\"
+fetch \"$SDEP_NAME\" \"$SDEP_VERSION\"
+build \"$SDEP_NAME\"
 " > dependencies/init.sh
 chmod +x dependencies/init.sh
 
