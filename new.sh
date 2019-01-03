@@ -41,8 +41,10 @@ cd \$SCRIPT_DIR
 . ./helpers.sh
 
 # -- $SDEP_NAME
-fetch \"$SDEP_NAME\" \"$SDEP_VERSION\"
-build \"$SDEP_NAME\"
+if [ ! -d $SDEP_NAME ] || [ -z \$OBF ]; then
+  fetch \"$SDEP_NAME\" \"$SDEP_VERSION\"
+  build \"$SDEP_NAME\"
+fi
 " > dependencies/init.sh
 chmod +x dependencies/init.sh
 
